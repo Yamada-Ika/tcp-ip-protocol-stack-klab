@@ -1,12 +1,25 @@
 #include "net.h"
 #include "util.h"
+#include "platform.h"
 
-#define DUMMY_MTU UINT16_MAX;
+// ダミーデバイスのMTU
+#define DUMMY_MTU UINT16_MAX
+
+// ダミーデバイスが使うIRQ番号
+#define DUMMY_IRQ INTR_IRQ_BASE
 
 static int dummy_transmit(net_device *dev, uint16_t type, const uint8_t *data,
                           size_t len, const void *dst) {
   debugf("dev=%s, type=0x%04x, len=%zu", dev->name, type, len);
   debugdump(data, len);
+  // テスト用に割り込みを発生させる
+  intr_raise_irq(DUMMY_IRQ);
+  return 0;
+}
+
+static int dummy_isr(unsigned int irq, void *id) {
+  // 呼び出されたことが分かれば良いのでデバッグ出力
+  debugf("irq=%u, dev=%s", irq, ((net_device *)id)->name);
   return 0;
 }
 
@@ -36,6 +49,8 @@ net_device *dummy_init(void) {
     errorf("net_device_register() failure");
     return NULL;
   }
+  // 割り込みハンドラとしてdummy_isrを登録
+  intr_request_irq(DUMMY_IRQ, dummy_isr, INTR_IRQ_SHARED, dev->name, dev);
   debugf("initialized, dev=%s", dev->name);
   return dev;
 }

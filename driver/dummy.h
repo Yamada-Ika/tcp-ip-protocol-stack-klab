@@ -3,6 +3,7 @@
 
 #include "net.h"
 
+
 net_device *dummy_init(void);
 
 #endif

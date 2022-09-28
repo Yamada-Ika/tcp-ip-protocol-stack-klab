@@ -53,6 +53,11 @@ static void net_device_foreach(net_device *dev, int (*func)(net_device *dev)) {
 
 int net_run(void) {
   debugf("open all devices...");
+  // 割り込み機構の起動
+  if (intr_run() == -1) {
+    errorf("intr_run() failure");
+    return -1;
+  }
   net_device_foreach(devices, net_device_open);
   debugf("running...");
   return 0;
@@ -61,11 +66,18 @@ int net_run(void) {
 int net_shutdown(void) {
   debugf("close all devices...");
   net_device_foreach(devices, net_device_close);
+  // 割り込み機構の終了
+  intr_shutdown();
   debugf("shutting down");
   return 0;
 }
 
 int net_init(void) {
+  // 割り込み機構の初期化
+  if (intr_init() == -1) {
+    errorf("intr_init() failure");
+    return -1;
+  }
   infof("initialized");
   return 0;
 }
