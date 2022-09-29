@@ -83,19 +83,13 @@ struct queue_entry {
   void *data;
 };
 
-struct queue {
-  struct queue_entry *head;
-  struct queue_entry *tail;
-  size_t num;
-};
-
-void queue_init(struct queue *queue) {
+void queue_init(struct queue_head *queue) {
   queue->head = NULL;
   queue->tail = NULL;
   queue->num = 0;
 }
 
-void *queue_push(struct queue *queue, void *data) {
+void *queue_push(struct queue_head *queue, void *data) {
   struct queue_entry *entry;
 
   if (!queue) {
@@ -118,7 +112,7 @@ void *queue_push(struct queue *queue, void *data) {
   return data;
 }
 
-void *queue_pop(struct queue *queue) {
+void *queue_pop(struct queue_head *queue) {
   struct queue_entry *entry;
   void *data;
 
@@ -136,15 +130,15 @@ void *queue_pop(struct queue *queue) {
   return data;
 }
 
-void *queue_peek(struct queue *queue) {
+void *queue_peek(struct queue_head *queue) {
   if (!queue || !queue->head) {
     return NULL;
   }
   return queue->head->data;
 }
 
-void queue_foreach(struct queue *queue, void (*func)(void *arg, void *data),
-                   void *arg) {
+void queue_foreach(struct queue_head *queue,
+                   void (*func)(void *arg, void *data), void *arg) {
   struct queue_entry *entry;
 
   if (!queue || !func) {

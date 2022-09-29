@@ -96,6 +96,7 @@ net_device *net_device_alloc(void) {
   NOTE: must not be call after net_run()
 */
 
+// ネットワークデバイスのリストに登録
 int net_device_register(net_device *dev) {
   static unsigned int index = 0;
 
